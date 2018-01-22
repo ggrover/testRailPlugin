@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!-- 
+	Tasks to compile and run TestRail plugin for updatig TestRail test suit using java code annoations,
+	parsing Junit tests and submitting results to TestRail.
+-->
+
+<project name="TestRailPlugin" default="run" basedir=".">
+
+	<!-- Fixed properties -->
+	<!--<property name="test.src.dir" location="../functionalTests/src" relative="true" />-->
+	<property name="src.dir" location="src" />
+	<property name="conf.dir" location="conf" />
+	<property name="test.dir" location="tests" />
+	<property name="dist.dir" location="dist" />
+	<property name="build.dir" location="bin" />
+	<property name="build.test.dir" location="bin/tests" />
+	<property name="test.report.dir" location="testreport" />
+	
+
+	<!-- Define the classpath which includes the junit.jar and the classes after compiling-->
+	<path id="proj.class.path">
+		<pathelement location="${basedir}/lib/tools.jar" />
+		<pathelement location="${basedir}/lib/testrailsdk-0.9.jar" />
+		<pathelement location="${basedir}/lib/jackson-mapper-asl-1.9.9.jar" />
+		<pathelement location="${basedir}/lib/jackson-core-asl-1.9.9.jar" />
+		<pathelement location="${basedir}/lib/httpclient-4.2.2.jar" />
+		<pathelement location="${basedir}/lib/httpcore-4.2.2.jar" />
+		<pathelement location="${basedir}/lib/commons-lang3-3.1.jar" />
+		<pathelement location="${basedir}/lib/commons-codec-1.6.jar" />
+		<pathelement location="${basedir}/lib/commons-logging-1.1.1.jar" />
+		<pathelement location="${basedir}/lib/slf4j-api-1.6.6.jar" />
+		<pathelement location="${basedir}/lib/jaxb-api.jar" />
+		<pathelement location="${basedir}/lib/jaxb-core.jar" />
+		<pathelement location="${basedir}/lib/jaxb-impl.jar" />
+		<pathelement location="${basedir}/lib/jaxb-jxc.jar" />
+		<pathelement location="${basedir}/lib/jaxb-xjc.jar" />
+		<pathelement location="${basedir}/lib/xercesImpl.jar" />
+		<pathelement location="${build.dir}" />
+		<pathelement location="${dist.dir}/lib" />
+		<pathelement location="${basedir}/conf" />
+	</path>
+	
+	<!-- load the properties files, load host specific ovverride file, then load default -->
+	<!-- set the file exists property (look for host override file) -->
+	<target name="-check-properties-override" unless="file.exists">
+		<property environment="env" />
+		<property name="env.HOSTNAME" value="${env.COMPUTERNAME}"/>
+	    <available property="file.exists" file="${conf.dir}/env.${env.HOSTNAME}"/>
+		
+	</target>
+	<!-- load the properties from the host specific overide file if it exists -->
+	<target name="load-properties-override" depends="-check-properties-override" if="${file.exists}">
+		<echo message="Override env properties file: ${conf.dir}/env.${env.HOSTNAME}" />
+		<loadproperties srcFile="${conf.dir}/env.${env.HOSTNAME}"/>
+	</target>
+	<!-- load the default property values -->
+	<target name="load-properties" depends="load-properties-override">
+		 <!--<echoproperties/> -->
+		<loadproperties srcFile="${conf.dir}/env.default" />	
+	</target>
+
+
+
+
+	
+	<!-- ################################################################## -->
+	<!--  setup, build, compile tasks -->
+	<!-- ################################################################## -->
+
+	
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean" depends="load-properties" >
+		<delete dir="${build.dir}" />
+		<delete dir="${test.report.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.test.dir}" />
+		<mkdir dir="${test.report.dir}" />
+	</target>
+
+	<!-- Compiles the java code (including the usage of library for JUnit -->
+	<target name="compile" depends="clean, makedir">
+		<echo> srcdir=${src.dir},destdir=${build.dir}, ${proj.class.path}</echo>
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
+			<classpath refid="proj.class.path" />
+		</javac>
+	</target>
+
+	<!-- Create a distribution -->
+	<target name="jar" depends="compile" description="generate testrail jar" >
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/lib/testRailPlugin.jar" basedir="${build.dir}"/>
+	</target>
+	<target name="dist" depends="jar" description="generate the distribution" >
+		<copy todir="${dist.dir}/lib">
+			<fileset dir="${basedir}/lib">
+				<include name="**/*.jar"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- Parse the Tessuite and sync testcases with Testrail -->
+	<target name="syncTestSuite" depends="compile">
+		<!-- Run the testsuite doclet -->
+		<!-- to do: make x platform -->	
+		<property name="javadoc_classpath" 
+			value="${basedir}/lib/commons-logging-api-1.1.1.jar;${basedir}/lib/commons-logging-adapters-1.1.1.jar;${basedir}/lib/slf4j-api-1.6.6.jar;{basedir}/lib/commons-logging-1.1.1.jar;${basedir}/lib/commons-codec-1.6.jar;${basedir}/lib/tools.jar;${basedir}/lib/testrailsdk-0.9.jar;${basedir}/lib/httpclient-4.2.2.jar;${basedir}/lib/jackson-mapper-asl-1.9.9.jar;${basedir}/lib/jackson-core-asl-1.9.9.jar;${basedir}/lib/commons-lang3-3.1.jar;${basedir}/lib/httpcore-4.2.2.jar;${build.dir};${basedir}/conf;${basedir}/dist/lib/testRailPlugin.jar"/>
+	   <javadoc docletpath="${basedir}" classpath="${javadoc_classpath}"> 
+
+	        <!--<fileset dir="${test.src.dir}/com/securespaces/server/restapi/test" casesensitive="yes">
+	            <include name="**/*.java"/>
+	        </fileset>-->
+            <fileset dir="${test.src.dir}" casesensitive="yes">
+              <include name="**/*.java"/>
+			</fileset>
+			
+	        <doclet  name="com.graphitesoftware.test.testrail.TestSuiteDoclet"
+	                 path="${javadoc_classpath}">
+	            
+	        </doclet>
+	    </javadoc>
+	</target>
+	
+	<!-- Parse the Tessuite and sync with Testrail -->
+	<target name="syncTestResults" depends="compile">
+		<echo>Java Version via Ant: ${ant.java.version}</echo> 
+		<echo>Java Version System Prop: ${java.version}</echo>
+		<echo>And version: ${ant.version}</echo>
+		<pathconvert property="classpathProp" refid="proj.class.path"/>
+		<echo>Classpath is ${classpathProp}</echo>
+		
+		<echo> srcdir=${src.dir},destdir=${build.dir}, ${proj.class.path}</echo>
+		<java classname="com.graphitesoftware.test.testrail.TestResultsManager" classpathref="proj.class.path"  >
+			<!-- override propery file values using sysproperty tag here, value must have length > 0
+			<sysproperty key="property name" value="" />-->
+
+		</java>
+	</target>
+	
+	<!-- Parse the Tessuite and sync with Testrail -->
+	<target name="syncJunitResults" depends="compile">
+		<echo>Java Version via Ant: ${ant.java.version}</echo> 
+		<echo>Java Version System Prop: ${java.version}</echo>
+		<echo>And version: ${ant.version}</echo>
+		<pathconvert property="classpathProp" refid="proj.class.path"/>
+		<echo>Classpath is ${classpathProp}</echo>
+		
+		<echo> srcdir=${src.dir},destdir=${build.dir}, ${proj.class.path}</echo>
+		<java classname="com.graphitesoftware.test.testrail.TestJunitResultsManager" classpathref="proj.class.path"  >
+			<!-- override propery file values using sysproperty tag here, value must have length > 0
+			<sysproperty key="property name" value="" />-->
+
+		</java>
+	</target>
+	
+	<!-- ################################################################## -->
+	<!--  Run the Nightly Regression Tests -->
+	<!-- ################################################################## -->
+
+	<target name="run" depends="syncTestSuite">
+
+		<description>Main target - parses test source to create test suite and syncrhonize with TestRail</description>
+	</target>
+
+
+	
+</project>
