@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,6 @@ import com.rmn.testrail.service.TestRailService;
  * Input
  *  - 
  * 
- * @author garney.adams
  *
  */
 public class TestSuiteManager extends TestSuite {

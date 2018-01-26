@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.util.ArrayList;
 import java.util.Collection;

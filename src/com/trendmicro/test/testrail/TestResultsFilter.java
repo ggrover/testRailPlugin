@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.io.File;
 import java.io.FilenameFilter;

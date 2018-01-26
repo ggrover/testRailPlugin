@@ -1,17 +1,9 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.rmn.testrail.entity.Project;
-import com.rmn.testrail.entity.TestSuite;
+import com.rmn.testrail.entity.TestCase;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
@@ -22,7 +14,6 @@ import com.sun.javadoc.Tag;
  * This is a custom doclet class that parses javadoc annotations of  JUnit test cases 
  * and updates a pre-existing TestRail TestSuite. 
  * 
- * @author garney.adams
  *
  */
 public class TestSuiteDoclet {
@@ -38,6 +29,7 @@ public class TestSuiteDoclet {
 	private static String PRIORITY_TAG = "@priority";
 	private static String TYPE_TAG = "@type";
 	private static String ASSIGNEDTO_TAG = "@assignedto";
+	private static String TEMPLATE_TAG = "@template";
 	private static boolean testAnnotationsUsed;
 	private static boolean testFilter;
 	private static boolean testFilterAutomated;
@@ -45,8 +37,8 @@ public class TestSuiteDoclet {
 	
 	private static String DEFAULT_PRECONDITIONS = "None";
 	//private static String DEFAULT_REFS = "1";
-	private static Integer DEFAULT_TYPE = 1;
-	private static Integer DEFAULT_PRIORITY = 3;
+	//private static Integer DEFAULT_TYPE = 1;
+	private static Integer DEFAULT_PRIORITY = 4;
 	
 	public static void init() {
 		//load some properties
@@ -99,7 +91,7 @@ public class TestSuiteDoclet {
 		
 		for( ClassDoc classDoc : classes ) {
 			System.out.println( "Class name:" + classDoc.name());
-			CustomSection section = new com.graphitesoftware.test.testrail.CustomSection();
+			CustomSection section = new CustomSection();
 			section.setName(classDoc.qualifiedName());
 			
 			for ( MethodDoc methodDoc : classDoc.methods() ) {
@@ -147,9 +139,10 @@ public class TestSuiteDoclet {
 	 * @param methodDoc
 	 * @return
 	 */
-	public static CustomTestCase parseTestCase( MethodDoc methodDoc) {
+	public static CustomTestCase parseTestCase(MethodDoc methodDoc) {
 		System.out.println( "..fq method name:" + methodDoc.qualifiedName());
 		CustomTestCase testCase = new CustomTestCase();
+		TestCase foo = new TestCase();
 		testCase.setTitle(methodDoc.name());
 		
 		String refs = getTagValue( REFS_TAG, methodDoc);
@@ -161,7 +154,20 @@ public class TestSuiteDoclet {
 		System.out.println("parseTestCase description:" + description);
 		if ( description != null && description.length() > 0 )
 			testCase.setCustomOurDescription(description);
-		
+
+		String templateId = getTagValue( TEMPLATE_TAG, methodDoc);
+		System.out.println("parseTestCase templateId:" + templateId);
+		if ( templateId != null && templateId.length() > 0 ){
+			Integer value = Integer.valueOf(templateId);
+			//only save if a valid value
+			if ( value >= 1 && value <= 5 ) {
+				testCase.setCustomTemplateId(value);
+			}
+		} else {
+			System.out.println("parseTestCase default templateId:" + 1);
+			testCase.setCustomTemplateId(1);
+		}
+
 		String preconds = getTagValue( PRECONDITIONS_TAG, methodDoc);
 		System.out.println("parseTestCase preconds:" + preconds);
 		if ( preconds != null && preconds.length() > 0 ) {
@@ -181,18 +187,18 @@ public class TestSuiteDoclet {
 		if ( expected != null && expected.length() > 0 )
 			testCase.setCustomExpected(expected);
 		
-        String typeId = getTagValue( TYPE_TAG, methodDoc);
-        System.out.println("parseTestCase type:" + typeId);
-        if ( typeId != null && typeId.length() > 0 ) {
-            Integer value = Integer.valueOf(typeId);
-            //only save if a valid value
-            if ( value >= 1 && value <= 6 ) {
-                testCase.setTypeId(value);
-            }
-		} else {
-        	System.out.println("parseTestCase default type:" + DEFAULT_TYPE);
-			testCase.setTypeId(DEFAULT_TYPE);		
-		}
+//        String typeId = getTagValue( TYPE_TAG, methodDoc);
+//        System.out.println("parseTestCase type:" + typeId);
+//        if ( typeId != null && typeId.length() > 0 ) {
+//            Integer value = Integer.valueOf(typeId);
+//            //only save if a valid value
+//            if ( value >= 1 && value <= 6 ) {
+//                testCase.setTypeId(value);
+//            }
+//		} else {
+//        	//System.out.println("parseTestCase default type:" + DEFAULT_TYPE);
+//			//testCase.setTypeId(DEFAULT_TYPE);
+//		}
         
         /*
          * So many ways for this to go wrong, in terms of users getting it wrong.

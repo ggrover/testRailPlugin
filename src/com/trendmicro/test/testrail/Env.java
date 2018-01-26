@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 
 import java.io.IOException;
@@ -10,40 +10,31 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.rmn.testrail.entity.Project;
-import com.rmn.testrail.entity.TestSuite;
-import com.sun.javadoc.AnnotationDesc;
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.MethodDoc;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.Tag;
-
 /**
  * Utils class
  * 
- * @author garney.adams
  *
  */
 public class Env {
 
-	static String FILE_NAME = "env";
-	static String FILE_SUFFIX = ".default";
+	public static String FILE_NAME = "env";
+	public static String FILE_SUFFIX = ".default";
 	static String PROJECT_NAME_PROPERTY = "project.name";
 	static String TESTSUITE_NAME_PROPERTY = "testsuite.name";
 	//static String TEST_FILE_DIRECTORY = "C:\\TEMP";
 	//static String TEST_FILE_PATTERN = ".*TEST-.*\\.xml";
 	static String TESTRESULTS_FILE_DIRECTORY = "testresults.file.directory";
 	static String TESTRESULTS_FILE_PATTERN = "testresults.file.pattern";
-	static String CLIENT_ID = "testrail.client.id";
-	static String USER_NAME = "testrail.username";
-	static String PASSWORD = "testrail.password";
+	public static String CLIENT_ID = "testrail.client.id";
+	public static String USER_NAME = "testrail.username";
+	public static String PASSWORD = "testrail.password";
 	static String TEST_ANNOTATIONS_USED = "project.testCase.annotations.used";
 	static String TEST_FILTER_AUTOMATED = "project.testCase.filter.automated";
 	static String TEST_FILTER_DEFAULT = "project.testCase.filter.default";
 	static String TEST_ASSIGNEDTO = "project.testCase.assignedto";
 	static String TEST_INCLUDEFAIL = "project.testCase.includefail";
 	static String TESTRESULTS_USEMETHOD = "testresults.usemethod";
-	static String TESTRESULTS_URL_RESULTS = "testresults.url.results"; 
+	static String TESTRESULTS_URL_RESULTS = "testresults.url.results";
 	static String TESTRESULTS_URL_BUILD = "testresults.url.build";
 	static String TESTRESULTS_URL_REGRESSION = "testresults.url.regression";
 
@@ -72,7 +63,7 @@ public class Env {
 				properties = new Properties();
 				properties.load(inputStream);
 			} else {
-				System.out.println("Failed to find properties file:" + fileName);
+				System.out.println("In the loadProperties section, Failed to find properties file:" + fileName);
 			}
 		} catch (IOException ioe) {
 			Logger.getGlobal().log(Level.INFO, "Failed to load properties file:" + fileName, ioe);

@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.io.IOException;
 
@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rmn.testrail.entity.BaseEntity;
-import com.rmn.testrail.entity.TestSuite;
 import com.rmn.testrail.entity.Section;
-import com.rmn.testrail.entity.TestCase;
 import com.rmn.testrail.service.TestRailService;
 import com.rmn.testrail.util.HTTPUtils;
 import com.rmn.testrail.util.JSONUtils;
@@ -81,7 +79,7 @@ public class CustomTestRailService extends TestRailService {
        String completeUrl = buildRequestURL( apiCall, urlParams );
         try {
             HttpPost request = new HttpPost( completeUrl );
-            String authentication = HTTPUtils.encodeAuthenticationBase64(username, password);
+            String authentication = utils.encodeAuthenticationBase64(username, password);
             request.addHeader("Authorization", "Basic " + authentication);
             request.addHeader("Content-Type", "application/json");
             System.out.println( "postRESTBody request uri:" + request.getURI().toString());

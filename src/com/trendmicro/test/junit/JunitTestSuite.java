@@ -1,13 +1,15 @@
-package com.graphitesoftware.test.junit;
+package com.trendmicro.test.junit;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import java.util.HashMap;
 import java.util.List;
 
 
-@XmlRootElement
-public class TestSuite {
+@XmlRootElement(name="testsuite")
+public class JunitTestSuite {
 	
     private String name;
     private int failures;
@@ -15,6 +17,7 @@ public class TestSuite {
     private int skipped;
     private int tests;
     private List<JunitTestCase> cases;
+    private HashMap<String, JunitTestCase> testCaseMap;
 
     @XmlAttribute
     public void setName(String name) { this.name = name; }
@@ -35,4 +38,14 @@ public class TestSuite {
     public int getErrors() { return this.errors; }
     public int getSkipped() { return this.skipped; }
     public int getTests() { return this.tests; }
+    
+    public JunitTestCase getTestCase(String name) {
+    	if ( testCaseMap == null ) {
+    		testCaseMap = new HashMap<String, JunitTestCase>();
+    		for ( JunitTestCase testCase : cases ) {
+    			testCaseMap.put(testCase.getName(), testCase);
+    		}
+    	}
+    	return testCaseMap.get(name);
+    }
 }

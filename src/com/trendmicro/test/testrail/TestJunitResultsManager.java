@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.io.File;
 import java.util.Date;
@@ -9,8 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import com.graphitesoftware.test.junit.JunitTestCase;
-import com.graphitesoftware.test.junit.JunitTestSuite;
+import com.trendmicro.test.junit.JunitTestCase;
+import com.trendmicro.test.junit.JunitTestSuite;
 import com.rmn.testrail.entity.Project;
 import com.rmn.testrail.entity.Section;
 import com.rmn.testrail.entity.TestCase;
@@ -26,7 +26,6 @@ import com.rmn.testrail.entity.User;
  * This class will parse Junit test result files and submit the results
  * to testRail as a TestRun.
  * 
- * @author garney.adams
  *
  */
 public class TestJunitResultsManager {
@@ -114,7 +113,7 @@ public class TestJunitResultsManager {
 						//junitResults.put(testSectionName+"."+testCase.getName(), testCase);
 						CustomTestCase tc = new CustomTestCase();
 						tc.setTitle(testCase.getName());
-						tc.setTypeId(1);
+						//tc.setTypeId(1);
 	    				tc.setSuiteId(testSuite.getId());
 	    				tc.setTestRailService(testRailService);
 			        	System.out.println("....Add TestCase to S(" + newSectionId + "):" + tc.getTitle() +", " + testSectionName);

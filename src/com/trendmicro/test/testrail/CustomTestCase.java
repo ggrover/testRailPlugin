@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.testrail;
+package com.trendmicro.test.testrail;
 
 import java.util.ArrayList;
 
@@ -33,6 +33,12 @@ public class CustomTestCase extends com.rmn.testrail.entity.TestCase {
     private String custom_preconds;
     public String getCustomPreconds() { return custom_preconds; }
     public void setCustomPreconds(String preconds) { this.custom_preconds = preconds; }
+
+
+    @JsonProperty("template_id")
+    private Integer templateId;
+    public Integer getCustomTemplateId() { return templateId; }
+    public void setCustomTemplateId(Integer template) { this.templateId = template; }
 
     @JsonProperty("custom_steps")
     private String custom_steps;

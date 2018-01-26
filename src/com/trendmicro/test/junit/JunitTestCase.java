@@ -1,4 +1,4 @@
-package com.graphitesoftware.test.junit;
+package com.trendmicro.test.junit;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
